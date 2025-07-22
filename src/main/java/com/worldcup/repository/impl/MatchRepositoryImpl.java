@@ -2,7 +2,7 @@ package com.worldcup.repository.impl;
 
 import com.worldcup.model.Match;
 import com.worldcup.repository.MatchRepository;
-import com.worldcup.utils.Validators;
+import com.worldcup.util.Validators;
 
 import java.util.ArrayList;
 import java.util.List;

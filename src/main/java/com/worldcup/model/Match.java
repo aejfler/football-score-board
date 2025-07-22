@@ -1,5 +1,7 @@
 package com.worldcup.model;
 
+import java.util.Objects;
+
 public class Match {
     private final String homeTeam;
     private final String awayTeam;
@@ -17,4 +19,9 @@ public class Match {
     public String getAwayTeam() { return awayTeam; }
     public int getHomeScore() { return homeScore; }
     public int getAwayScore() { return awayScore; }
+
+    public void updateScore(int homeScore, int awayScore) {
+        this.homeScore = homeScore;
+        this.awayScore = awayScore;
+    }
 }
