@@ -1,4 +1,4 @@
-package com.worldcup.utils;
+package com.worldcup.util;
 
 public class Validators {
     private Validators() {}
