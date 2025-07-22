@@ -24,4 +24,21 @@ public class Match {
         this.homeScore = homeScore;
         this.awayScore = awayScore;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Match match)) return false;
+        return homeTeam.equals(match.homeTeam) && awayTeam.equals(match.awayTeam);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(homeTeam, awayTeam);
+    }
+
+    @Override
+    public String toString() {
+        return homeTeam + " " + homeScore + " - " + awayTeam + " " + awayScore;
+    }
 }
