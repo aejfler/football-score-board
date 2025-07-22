@@ -1,6 +1,7 @@
 package service;
 
 import com.worldcup.model.Match;
+import com.worldcup.repository.impl.MatchRepositoryImpl;
 import com.worldcup.service.ScoreBoardService;
 import com.worldcup.service.impl.ScoreBoardServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,12 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ScoreBoardServiceImplTest {
 
     private ScoreBoardService service;
-    private static final String HOME_TEAM = "Spain"; 
+    private static final String HOME_TEAM = "Spain";
     private static final String AWAY_TEAM = "Italy";
 
     @BeforeEach
     void setUp() {
-        service = new ScoreBoardServiceImpl();
+        service = new ScoreBoardServiceImpl(new MatchRepositoryImpl());
     }
 
     @Test
@@ -89,7 +90,7 @@ public class ScoreBoardServiceImplTest {
     void updateScore_shouldThrowExceptionWhenMatchIsFinished() {
         service.startMatch(HOME_TEAM, AWAY_TEAM);
         service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 3);
-        service.finishMatch(HOME_TEAM, AWAY_TEAM);    
+        service.finishMatch(HOME_TEAM, AWAY_TEAM);
         assertThrows(Exception.class, () ->
                 service.updateScore(HOME_TEAM, AWAY_TEAM, 1, 1));
     }
