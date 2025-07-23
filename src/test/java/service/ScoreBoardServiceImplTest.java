@@ -46,7 +46,7 @@ public class ScoreBoardServiceImplTest {
     void startMatch_shouldThrowException_whenTeamIsAlreadyInMatch() {
         service.startMatch(HOME_TEAM, AWAY_TEAM);
 
-        assertThrows(Exception.class, () -> service.startMatch(HOME_TEAM, "Germany"));
+        assertThrows(IllegalArgumentException.class, () -> service.startMatch(HOME_TEAM, "Germany"));
     }
 
     @Test

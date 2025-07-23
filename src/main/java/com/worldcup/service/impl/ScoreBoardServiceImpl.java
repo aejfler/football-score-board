@@ -18,6 +18,17 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
 
     @Override
     public void startMatch(String homeTeam, String awayTeam) {
+        boolean isTeamAlreadyPlaying = matchRepository.findAll().stream()
+                .anyMatch(match ->
+                        match.getHomeTeam().equalsIgnoreCase(homeTeam) ||
+                                match.getAwayTeam().equalsIgnoreCase(homeTeam) ||
+                                match.getHomeTeam().equalsIgnoreCase(awayTeam) ||
+                                match.getAwayTeam().equalsIgnoreCase(awayTeam)
+                );
+
+        if (isTeamAlreadyPlaying) {
+            throw new IllegalArgumentException("One or both teams are already playing");
+        }
         Match match = new Match(homeTeam, awayTeam);
         matchRepository.save(match);
     }
