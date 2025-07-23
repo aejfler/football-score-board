@@ -36,14 +36,14 @@ public class MatchRepositoryTest {
     void save_shouldThrowException_whenTeamsAreNotValid() {
         Match match = new Match(HOME_TEAM, "");
 
-        assertThrows(Exception.class, () -> matchRepository.save(match));
+        assertThrows(IllegalArgumentException.class, () -> matchRepository.save(match));
     }
 
     @Test
     void save_shouldThrowException_whenTeamIsPlayingAgainstItself() {
         Match match = new Match(HOME_TEAM, HOME_TEAM);
 
-        assertThrows(Exception.class, () -> matchRepository.save(match));
+        assertThrows(IllegalArgumentException.class, () -> matchRepository.save(match));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class MatchRepositoryTest {
     @Test
     void delete_shouldThrowException_whenMatchIsNotFound() {
         Match match = new Match("non existing team", "ghost team");
-        assertThrows(Exception.class, () -> matchRepository.delete(match));
+        assertThrows(IllegalArgumentException.class, () -> matchRepository.delete(match));
     }
 
     @Test
