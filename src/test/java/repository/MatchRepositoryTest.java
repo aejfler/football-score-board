@@ -70,6 +70,13 @@ public class MatchRepositoryTest {
     }
 
     @Test
+    void delete_shouldThrowException_whenMatchIsNull() {
+        assertThatThrownBy(() -> matchRepository.delete(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Match cannot be null");
+    }
+
+    @Test
     void findAll_shouldReturnAllPresentMatches() {
         Match firstMatch = new Match(HOME_TEAM, AWAY_TEAM);
         Match secondMatch = new Match("Netherlands", "Germany");
@@ -79,5 +86,37 @@ public class MatchRepositoryTest {
         List<Match> foundMatches = matchRepository.findAll();
 
         assertThat(foundMatches).hasSize(matches.size());
+    }
+
+    @Test
+    void findByTeams_shouldReturnMatch_whenMatchExists() {
+        Match match = new Match(HOME_TEAM, AWAY_TEAM);
+        matchRepository.save(match);
+
+        Optional<Match> foundMatch = matchRepository.findByTeams(HOME_TEAM, AWAY_TEAM);
+
+        assertThat(foundMatch).isPresent();
+        assertThat(foundMatch.get()).isEqualTo(match);
+    }
+
+    @Test
+    void findByTeams_shouldReturnEmpty_whenMatchDoesNotExist() {
+        Optional<Match> foundMatch = matchRepository.findByTeams("NonExistingTeam", "AnotherNonExistingTeam");
+
+        assertThat(foundMatch).isNotPresent();
+    }
+
+    @Test
+    void findByTeams_shouldThrowException_whenTeamIsNull() {
+        assertThatThrownBy(() -> matchRepository.findByTeams(null, AWAY_TEAM))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("homeTeam");
+    }
+
+    @Test
+    void findByTeams_shouldThrowException_whenTeamsAreTheSame() {
+        assertThatThrownBy(() -> matchRepository.findByTeams(HOME_TEAM, HOME_TEAM))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("A team cannot play against itself");
     }
 }
