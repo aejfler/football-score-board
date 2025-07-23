@@ -43,6 +43,6 @@ public class Match {
 
     @Override
     public String toString() {
-        return homeTeam + " " + homeScore + " - " + awayTeam + " " + awayScore;
+        return String.format("%s %d - %s %d", homeTeam, homeScore, awayTeam, awayScore);
     }
 }
