@@ -51,8 +51,8 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
     public List<Match> getSummary() {
         return matchRepository.findAll().stream()
                 .sorted(Comparator
-                        .comparingInt(Match::totalScore).reversed()
-                        .thenComparing(Match::getLastUpdated).reversed())
+                        .comparing(Match::getTotalScore, Comparator.reverseOrder())
+                        .thenComparing(Match::getLastUpdated, Comparator.reverseOrder()))
                 .collect(Collectors.toList());
     }
 }
