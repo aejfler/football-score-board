@@ -21,17 +21,12 @@ public class Match {
     public String getAwayTeam() { return awayTeam; }
     public int getHomeScore() { return homeScore; }
     public int getAwayScore() { return awayScore; }
-    public long getLastUpdated() {
-        return lastUpdated;
-    }
+    public long getLastUpdated() { return lastUpdated; }
+    public int getTotalScore() { return homeScore + awayScore; }
 
     public void updateScore(int homeScore, int awayScore) {
         this.homeScore = homeScore;
         this.awayScore = awayScore;
-    }
-
-    public int totalScore() {
-        return homeScore + awayScore;
     }
 
     @Override
