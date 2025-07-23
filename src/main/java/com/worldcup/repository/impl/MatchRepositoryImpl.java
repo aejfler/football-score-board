@@ -19,22 +19,23 @@ public class MatchRepositoryImpl implements MatchRepository {
 
     @Override
     public void save(List<Match> matches) {
-        for (Match match : matches) {
-            validateMatch(match);
-        }
+        matches.forEach(this::validateMatch);
         inMemoryMatches.addAll(matches);
     }
 
     @Override
     public void delete(Match match) {
-        boolean removed = inMemoryMatches.remove(match);
-        if (!removed) {
+        if (match == null) {
+            throw new IllegalArgumentException("Match cannot be null");
+        }
+        if (!inMemoryMatches.remove(match)) {
             throw new IllegalArgumentException("Match not found");
         }
     }
 
     @Override
     public Optional<Match> findByTeams(String homeTeam, String awayTeam) {
+        validateMatch(new Match(homeTeam, awayTeam));
         return inMemoryMatches.stream()
                 .filter(g -> g.getHomeTeam().equals(homeTeam) && g.getAwayTeam().equals(awayTeam))
                 .findFirst();

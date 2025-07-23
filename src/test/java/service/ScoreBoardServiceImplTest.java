@@ -13,7 +13,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ScoreBoardServiceImplTest {
 
@@ -41,19 +40,23 @@ public class ScoreBoardServiceImplTest {
         service.startMatch(HOME_TEAM, AWAY_TEAM);
         List<Match> matches = service.getSummary();
 
-        assertThat(matches.getFirst()).extracting(Match::getHomeScore, Match::getAwayScore).containsExactly(0,0);
+        assertThat(matches.getFirst()).extracting(Match::getHomeScore, Match::getAwayScore).containsExactly(0, 0);
     }
 
     @Test
     void startMatch_shouldThrowException_whenTeamIsAlreadyInMatch() {
         service.startMatch(HOME_TEAM, AWAY_TEAM);
 
-        assertThrows(IllegalArgumentException.class, () -> service.startMatch(HOME_TEAM, "Germany"));
+        assertThatThrownBy(() -> service.startMatch(HOME_TEAM, "Germany"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("One or both teams are already playing");
     }
 
     @Test
     void startMatch_shouldThrowException_whenTeamIsPlayingWithItself() {
-        assertThrows(IllegalArgumentException.class, () -> service.startMatch(HOME_TEAM, HOME_TEAM));
+        assertThatThrownBy(() -> service.startMatch(HOME_TEAM, HOME_TEAM))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("A team cannot play against itself");
     }
 
     @Test
@@ -63,12 +66,13 @@ public class ScoreBoardServiceImplTest {
         service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 3);
         List<Match> matches = service.getSummary();
 
-        assertThat(matches.getFirst()).extracting(Match::getHomeScore, Match::getAwayScore).containsExactly(2,3);
+        assertThat(matches.getFirst()).extracting(Match::getHomeScore, Match::getAwayScore).containsExactly(2, 3);
     }
 
     @Test
     void finishMatch_shouldRemoveMatchFromScoreBoard() {
         service.startMatch(HOME_TEAM, AWAY_TEAM);
+
         service.finishMatch(HOME_TEAM, AWAY_TEAM);
 
         assertEquals(0, service.getSummary().size());
@@ -77,6 +81,7 @@ public class ScoreBoardServiceImplTest {
     @Test
     void finishMatch_shouldThrowException_whenNoMatchFound() {
         service.startMatch(HOME_TEAM, AWAY_TEAM);
+
         service.finishMatch(HOME_TEAM, AWAY_TEAM);
 
         assertEquals(0, service.getSummary().size());
@@ -92,8 +97,10 @@ public class ScoreBoardServiceImplTest {
     @Test
     void updateScore_shouldThrowException_whenMatchIsFinished() {
         service.startMatch(HOME_TEAM, AWAY_TEAM);
+
         service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 3);
         service.finishMatch(HOME_TEAM, AWAY_TEAM);
+
         assertThatThrownBy(() -> service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 4))
                 .isInstanceOf(MatchNotFoundException.class)
                 .hasMessage("Match not found or already finished");

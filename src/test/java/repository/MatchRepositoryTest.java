@@ -7,7 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,21 +33,24 @@ public class MatchRepositoryTest {
     }
 
     @Test
-    void save_shouldThrowException_whenTeamsAreNotValid() {
+    void save_shouldThrowException_whenTeamIsEmpty() {
         Match match = new Match(HOME_TEAM, "");
-
-        assertThrows(IllegalArgumentException.class, () -> matchRepository.save(match));
+        assertThatThrownBy(() -> matchRepository.save(match))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("awayTeam cannot be null or blank");
     }
 
     @Test
     void save_shouldThrowException_whenTeamIsPlayingAgainstItself() {
         Match match = new Match(HOME_TEAM, HOME_TEAM);
 
-        assertThrows(IllegalArgumentException.class, () -> matchRepository.save(match));
+        assertThatThrownBy(() -> matchRepository.save(match))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("A team cannot play against itself");
     }
 
     @Test
-    void delete_shouldDeleteMatch() {
+    void delete_shouldDeleteMatch_whenMatchIsPresent() {
         Match match = new Match(HOME_TEAM, AWAY_TEAM);
         matchRepository.save(match);
 
@@ -60,17 +63,21 @@ public class MatchRepositoryTest {
     @Test
     void delete_shouldThrowException_whenMatchIsNotFound() {
         Match match = new Match("non existing team", "ghost team");
-        assertThrows(IllegalArgumentException.class, () -> matchRepository.delete(match));
+
+        assertThatThrownBy(() -> matchRepository.delete(match))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Match not found");
     }
 
     @Test
     void findAll_shouldReturnAllPresentMatches() {
         Match firstMatch = new Match(HOME_TEAM, AWAY_TEAM);
         Match secondMatch = new Match("Netherlands", "Germany");
-        matchRepository.save(List.of(firstMatch, secondMatch));
+        List<Match> matches = List.of(firstMatch, secondMatch);
+        matchRepository.save(matches);
 
-        List<Match> matches = matchRepository.findAll();
+        List<Match> foundMatches = matchRepository.findAll();
 
-        assertThat(matches).hasSize(2);
+        assertThat(foundMatches).hasSize(matches.size());
     }
 }
