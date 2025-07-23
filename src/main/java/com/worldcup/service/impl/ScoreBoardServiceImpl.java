@@ -5,7 +5,9 @@ import com.worldcup.model.Match;
 import com.worldcup.repository.MatchRepository;
 import com.worldcup.service.ScoreBoardService;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ScoreBoardServiceImpl implements ScoreBoardService {
     private final MatchRepository matchRepository;
@@ -36,6 +38,10 @@ public class ScoreBoardServiceImpl implements ScoreBoardService {
 
     @Override
     public List<Match> getSummary() {
-        return List.of();
+        return matchRepository.findAll().stream()
+                .sorted(Comparator
+                        .comparingInt(Match::totalScore).reversed()
+                        .thenComparing(Match::getLastUpdated).reversed())
+                .collect(Collectors.toList());
     }
 }
