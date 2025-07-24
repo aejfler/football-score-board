@@ -5,11 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Getter
 @Setter
 public class Match {
-    private static long sequenceCounter = 0;
+    private static final AtomicLong sequenceCounter = new AtomicLong(0);
     private long lastUpdated;
     private final String homeTeam;
     private final String awayTeam;
@@ -21,18 +22,22 @@ public class Match {
         this.awayTeam = awayTeam;
         this.homeScore = 0;
         this.awayScore = 0;
+        validate();
     }
 
-    public int getTotalScore() { return homeScore + awayScore; }
+    public int getTotalScore() {
+        return homeScore + awayScore;
+    }
 
     public void updateScore(int homeScore, int awayScore) {
         Validators.validateTeamScores(homeScore, awayScore);
         this.homeScore = homeScore;
         this.awayScore = awayScore;
-        this.lastUpdated = ++sequenceCounter;
+        this.lastUpdated = sequenceCounter.incrementAndGet();
     }
 
     public void validate() {
+        Validators.validateTeamScores(this.homeScore, this.awayScore);
         Validators.validateTeamName(this.homeTeam);
         Validators.validateTeamName(this.awayTeam);
         Validators.validateTeamsAreDifferent(this.homeTeam, this.awayTeam);

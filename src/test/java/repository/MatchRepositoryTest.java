@@ -37,17 +37,14 @@ public class MatchRepositoryTest {
 
     @Test
     void save_shouldThrowException_whenTeamIsEmpty() {
-        Match match = new Match(HOME_TEAM, "");
-        assertThatThrownBy(() -> matchRepository.save(match))
+        assertThatThrownBy(() -> matchRepository.save(new Match(HOME_TEAM, "")))
                 .isInstanceOf(InvalidTeamNameException.class)
                 .hasMessageContaining("Team name cannot be empty or null");
     }
 
     @Test
     void save_shouldThrowException_whenTeamIsPlayingAgainstItself() {
-        Match match = new Match(HOME_TEAM, HOME_TEAM);
-
-        assertThatThrownBy(() -> matchRepository.save(match))
+        assertThatThrownBy(() -> matchRepository.save(new Match(HOME_TEAM, HOME_TEAM)))
                 .isInstanceOf(SelfMatchException.class)
                 .hasMessageContaining("A team cannot play against itself");
     }
