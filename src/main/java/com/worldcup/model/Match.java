@@ -9,6 +9,8 @@ import java.util.Objects;
 @Getter
 @Setter
 public class Match {
+    private static long sequenceCounter = 0;
+    private long lastUpdated;
     private final String homeTeam;
     private final String awayTeam;
     private int homeScore;
