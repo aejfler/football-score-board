@@ -72,6 +72,33 @@ public class ScoreBoardServiceImplTest {
     }
 
     @Test
+    void updateScore_shouldThrowException_whenScoresContainNegativeValues() {
+        service.startMatch(HOME_TEAM, AWAY_TEAM);
+
+        assertThatThrownBy(() -> service.updateScore(HOME_TEAM, AWAY_TEAM, -2, 3))
+                .isInstanceOf(NegativeScoreException.class).hasMessageContaining(  "Scores must be zero or positive. Received: home = -2, away = 3");
+    }
+
+    @Test
+    void updateScore_shouldThrowException_whenMatchNotFound() {
+        assertThatThrownBy(() -> service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 3))
+                .isInstanceOf(MatchNotFoundException.class)
+                .hasMessage("Match not found or already finished");
+    }
+
+    @Test
+    void updateScore_shouldThrowException_whenMatchIsFinished() {
+        service.startMatch(HOME_TEAM, AWAY_TEAM);
+
+        service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 3);
+        service.finishMatch(HOME_TEAM, AWAY_TEAM);
+
+        assertThatThrownBy(() -> service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 4))
+                .isInstanceOf(MatchNotFoundException.class)
+                .hasMessage("Match not found or already finished");
+    }
+
+    @Test
     void finishMatch_shouldRemoveMatchFromScoreBoard() {
         service.startMatch(HOME_TEAM, AWAY_TEAM);
 

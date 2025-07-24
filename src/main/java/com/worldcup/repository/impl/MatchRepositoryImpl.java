@@ -1,8 +1,8 @@
 package com.worldcup.repository.impl;
 
+import com.worldcup.exception.MatchNotFoundException;
 import com.worldcup.model.Match;
 import com.worldcup.repository.MatchRepository;
-import com.worldcup.util.Validators;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,29 +13,27 @@ public class MatchRepositoryImpl implements MatchRepository {
 
     @Override
     public void save(Match match) {
-        validateMatch(match);
+        match.validate();
         inMemoryMatches.add(match);
     }
 
     @Override
     public void save(List<Match> matches) {
-        matches.forEach(this::validateMatch);
+        matches.forEach(Match::validate);
         inMemoryMatches.addAll(matches);
     }
 
     @Override
     public void delete(Match match) {
-        if (match == null) {
-            throw new IllegalArgumentException("Match cannot be null");
-        }
-        if (!inMemoryMatches.remove(match)) {
-            throw new IllegalArgumentException("Match not found");
+        if (!inMemoryMatches.remove(match) || match == null) {
+            throw new MatchNotFoundException();
         }
     }
 
     @Override
     public Optional<Match> findByTeams(String homeTeam, String awayTeam) {
-        validateMatch(new Match(homeTeam, awayTeam));
+        Match match = new Match(homeTeam, awayTeam);
+        match.validate();
         return inMemoryMatches.stream()
                 .filter(g -> g.getHomeTeam().equals(homeTeam) && g.getAwayTeam().equals(awayTeam))
                 .findFirst();
@@ -44,11 +42,5 @@ public class MatchRepositoryImpl implements MatchRepository {
     @Override
     public List<Match> findAll() {
         return new ArrayList<>(inMemoryMatches);
-    }
-
-    private void validateMatch(Match match) {
-        Validators.validateTeamName(match.getHomeTeam(), "homeTeam");
-        Validators.validateTeamName(match.getAwayTeam(), "awayTeam");
-        Validators.validateTeamsAreDifferent(match.getHomeTeam(), match.getAwayTeam());
     }
 }
