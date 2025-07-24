@@ -3,6 +3,7 @@ package com.worldcup.repository.impl;
 import com.worldcup.exception.MatchNotFoundException;
 import com.worldcup.model.Match;
 import com.worldcup.repository.MatchRepository;
+import com.worldcup.util.Validators;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,13 +15,19 @@ public class MatchRepositoryImpl implements MatchRepository {
     @Override
     public void save(Match match) {
         match.validate();
-        inMemoryMatches.add(match);
+        if (!inMemoryMatches.contains(match)) {
+            inMemoryMatches.add(match);
+        }
     }
 
     @Override
     public void save(List<Match> matches) {
         matches.forEach(Match::validate);
-        inMemoryMatches.addAll(matches);
+        for (Match match : matches) {
+            if (!inMemoryMatches.contains(match)) {
+                inMemoryMatches.add(match);
+            }
+        }
     }
 
     @Override
@@ -32,8 +39,9 @@ public class MatchRepositoryImpl implements MatchRepository {
 
     @Override
     public Optional<Match> findByTeams(String homeTeam, String awayTeam) {
-        Match match = new Match(homeTeam, awayTeam);
-        match.validate();
+        Validators.validateTeamName(homeTeam);
+        Validators.validateTeamName(awayTeam);
+        Validators.validateTeamsAreDifferent(homeTeam, awayTeam);
         return inMemoryMatches.stream()
                 .filter(g -> g.getHomeTeam().equals(homeTeam) && g.getAwayTeam().equals(awayTeam))
                 .findFirst();
