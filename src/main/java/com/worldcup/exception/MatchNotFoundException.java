@@ -1,7 +1,7 @@
 package com.worldcup.exception;
 
 public class MatchNotFoundException extends RuntimeException {
-    public MatchNotFoundException(String message) {
-        super(message);
+    public MatchNotFoundException() {
+        super("Match not found or already finished");
     }
 }

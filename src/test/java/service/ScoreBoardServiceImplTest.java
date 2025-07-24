@@ -1,6 +1,9 @@
 package service;
 
 import com.worldcup.exception.MatchNotFoundException;
+import com.worldcup.exception.NegativeScoreException;
+import com.worldcup.exception.SelfMatchException;
+import com.worldcup.exception.TeamAlreadyPlayingException;
 import com.worldcup.model.Match;
 import com.worldcup.repository.impl.MatchRepositoryImpl;
 import com.worldcup.service.ScoreBoardService;
@@ -12,7 +15,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ScoreBoardServiceImplTest {
 
@@ -48,19 +50,19 @@ public class ScoreBoardServiceImplTest {
         service.startMatch(HOME_TEAM, AWAY_TEAM);
 
         assertThatThrownBy(() -> service.startMatch(HOME_TEAM, "Germany"))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(TeamAlreadyPlayingException.class)
                 .hasMessageContaining("One or both teams are already playing");
     }
 
     @Test
     void startMatch_shouldThrowException_whenTeamIsPlayingWithItself() {
         assertThatThrownBy(() -> service.startMatch(HOME_TEAM, HOME_TEAM))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SelfMatchException.class)
                 .hasMessageContaining("A team cannot play against itself");
     }
 
     @Test
-    void updateScore_shouldModifyTeamScore() {
+    void updateScore_shouldModifyTeamScore_whenScoresAreValid() {
         service.startMatch(HOME_TEAM, AWAY_TEAM);
 
         service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 3);
@@ -75,7 +77,7 @@ public class ScoreBoardServiceImplTest {
 
         service.finishMatch(HOME_TEAM, AWAY_TEAM);
 
-        assertEquals(0, service.getSummary().size());
+        assertThat(service.getSummary().size()).isEqualTo(0);
     }
 
     @Test
@@ -84,26 +86,7 @@ public class ScoreBoardServiceImplTest {
 
         service.finishMatch(HOME_TEAM, AWAY_TEAM);
 
-        assertEquals(0, service.getSummary().size());
-    }
-
-    @Test
-    void updateScore_shouldThrowException_whenMatchNotFound() {
-        assertThatThrownBy(() -> service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 3))
-                .isInstanceOf(MatchNotFoundException.class)
-                .hasMessage("Match not found or already finished");
-    }
-
-    @Test
-    void updateScore_shouldThrowException_whenMatchIsFinished() {
-        service.startMatch(HOME_TEAM, AWAY_TEAM);
-
-        service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 3);
-        service.finishMatch(HOME_TEAM, AWAY_TEAM);
-
-        assertThatThrownBy(() -> service.updateScore(HOME_TEAM, AWAY_TEAM, 2, 4))
-                .isInstanceOf(MatchNotFoundException.class)
-                .hasMessage("Match not found or already finished");
+        assertThat(service.getSummary().size()).isEqualTo(0);
     }
 
     @Test

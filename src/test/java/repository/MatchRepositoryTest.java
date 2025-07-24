@@ -1,5 +1,8 @@
 package repository;
 
+import com.worldcup.exception.InvalidTeamNameException;
+import com.worldcup.exception.MatchNotFoundException;
+import com.worldcup.exception.SelfMatchException;
 import com.worldcup.model.Match;
 import com.worldcup.repository.MatchRepository;
 import com.worldcup.repository.impl.MatchRepositoryImpl;
@@ -36,8 +39,8 @@ public class MatchRepositoryTest {
     void save_shouldThrowException_whenTeamIsEmpty() {
         Match match = new Match(HOME_TEAM, "");
         assertThatThrownBy(() -> matchRepository.save(match))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("awayTeam cannot be null or blank");
+                .isInstanceOf(InvalidTeamNameException.class)
+                .hasMessageContaining("Team name cannot be empty or null");
     }
 
     @Test
@@ -45,7 +48,7 @@ public class MatchRepositoryTest {
         Match match = new Match(HOME_TEAM, HOME_TEAM);
 
         assertThatThrownBy(() -> matchRepository.save(match))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SelfMatchException.class)
                 .hasMessageContaining("A team cannot play against itself");
     }
 
@@ -65,15 +68,15 @@ public class MatchRepositoryTest {
         Match match = new Match("non existing team", "ghost team");
 
         assertThatThrownBy(() -> matchRepository.delete(match))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Match not found");
+                .isInstanceOf(MatchNotFoundException.class)
+                .hasMessageContaining("Match not found or already finished");
     }
 
     @Test
     void delete_shouldThrowException_whenMatchIsNull() {
         assertThatThrownBy(() -> matchRepository.delete(null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Match cannot be null");
+                .isInstanceOf(MatchNotFoundException.class)
+                .hasMessageContaining("Match not found or already finished");
     }
 
     @Test
@@ -86,6 +89,7 @@ public class MatchRepositoryTest {
         List<Match> foundMatches = matchRepository.findAll();
 
         assertThat(foundMatches).hasSize(matches.size());
+        assertThat(foundMatches).containsExactly(firstMatch, secondMatch);
     }
 
     @Test
@@ -109,14 +113,14 @@ public class MatchRepositoryTest {
     @Test
     void findByTeams_shouldThrowException_whenTeamIsNull() {
         assertThatThrownBy(() -> matchRepository.findByTeams(null, AWAY_TEAM))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("homeTeam");
+                .isInstanceOf(InvalidTeamNameException.class)
+                .hasMessageContaining("Team name cannot be empty or null");
     }
 
     @Test
     void findByTeams_shouldThrowException_whenTeamsAreTheSame() {
         assertThatThrownBy(() -> matchRepository.findByTeams(HOME_TEAM, HOME_TEAM))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(SelfMatchException.class)
                 .hasMessageContaining("A team cannot play against itself");
     }
 }

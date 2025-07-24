@@ -7,15 +7,15 @@ public class Validators {
         return s == null || s.isBlank();
     }
 
-    public static void validateTeamName(String teamName, String fieldName) {
+    public static void validateTeamName(String teamName) {
         if (isNullOrBlank(teamName)) {
-            throw new IllegalArgumentException(fieldName + " cannot be null or blank");
+            throw new InvalidTeamNameException();
         }
     }
 
     public static void validateTeamsAreDifferent(String homeTeam, String awayTeam) {
         if (homeTeam != null && homeTeam.equals(awayTeam)) {
-            throw new IllegalArgumentException("A team cannot play against itself");
+            throw new SelfMatchException();
         }
     }
 }
